@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8" />
+<title>CapstonePPT 통합 테스트</title>
+<style>
+body{font-family:sans-serif;padding:16px}
+section{margin-bottom:24px}
+pre{background:#f5f5f5;padding:8px;white-space:pre-wrap}
+.viewer{display:flex;gap:24px}
+.left,.right{width:50%}
+.kw{background:yellow}
+.hidden{display:none}
+</style>
+<body>
+<h1>MVP 통합 플로우</h1>
+
+<section>
+  <h2>1. PPT 업로드 → 파싱/키워드/과목 자동</h2>
+  <input type="file" id="ppt" accept=".ppt,.pptx" />
+  <button id="btnUpload">업로드</button>
+  <pre id="info"></pre>
+</section>
+
+<section>
+  <h2>2. 모드 선택</h2>
+  <button data-level="하" class="btn-level">하</button>
+  <button data-level="중" class="btn-level">중</button>
+  <button data-level="상" class="btn-level">상</button>
+  <button id="btnTest">테스트 모드</button>
+  <pre id="modeOut"></pre>
+</section>
+
+<section id="testBox" class="hidden">
+  <h2>3. 테스트(객관식)</h2>
+  <div id="questions"></div>
+  <button id="btnSubmit">답변 제출</button>
+  <pre id="testResult"></pre>
+</section>
+
+<section id="viewer" class="hidden">
+  <h2>4. 결과 화면</h2>
+  <div class="viewer">
+    <div class="left">
+      <h3 id="slideTitle"></h3>
+      <pre id="slideText"></pre>
+      <button id="prev">이전</button>
+      <button id="next">다음</button>
+    </div>
+    <div class="right">
+      <h3>핵심 단어</h3>
+      <p id="kwList"></p>
+      <h3>개념 설명</h3>
+      <pre id="expText"></pre>
+      <button id="btnDownload">ZIP 다운로드</button>
+    </div>
+  </div>
+</section>
+
+<script>
+let slides={}, keywords={}, subject="", level="";
+let questions=[], answers=[];
+let explanations={};
+let order=[], idx=0;
+
+const $ = (s)=>document.querySelector(s);
+const show = (el, v)=> el.classList.toggle("hidden", !v);
+
+$("#btnUpload").onclick = async () => {
+  const f = $("#ppt").files[0];
+  if(!f) return alert("파일 선택");
+
+  const fd = new FormData(); fd.append("file", f);
+  const r = await fetch("/analyze", {method:"POST", body: fd});
+  const data = await r.json();
+  if(data.error) return alert(data.error);
+
+  slides = data.slides; keywords = data.keywords; subject = data.subject;
+  order = Object.keys(slides).sort((a,b)=>+a.split("_")[1]-+b.split("_")[1]);
+
+  $("#info").textContent = JSON.stringify({subject, slides, keywords}, null, 2);
+  $("#modeOut").textContent = `과목: ${subject}`;
+};
+
+document.querySelectorAll(".btn-level").forEach(b=>{
+  b.onclick = async () => {
+    level = b.dataset.level;
+    // 등급 선택 확정만 하고 바로 슬라이드 설명 생성 호출
+    await buildExplanations(level);
+    $("#modeOut").textContent = `모드: A(직접선택) / 등급: ${level}`;
+    openViewer();
+  };
+});
+
+$("#btnTest").onclick = async () => {
+  // 테스트 시작
+  const r = await fetch("/mode/test/start", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({subject})
+  });
+  const data = await r.json();
+  questions = data.questions || [];
+  renderQuestions();
+  show($("#testBox"), true);
+};
+
+$("#btnSubmit").onclick = async () => {
+  // 수집
+  answers = questions.map((q,i)=>{
+    const s = document.querySelector(`input[name='q${i}']:checked`);
+    return s ? s.value : "미응답";
+  });
+  const r = await fetch("/mode/test/submit", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({subject, questions, answers})
+  });
+  const data = await r.json();
+  $("#testResult").textContent = JSON.stringify(data, null, 2);
+  level = data.level || "하";
+  await buildExplanations(level);
+  openViewer();
+};
+
+async function buildExplanations(lv){
+  const r = await fetch("/explain/slides", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({subject, level: lv, slides, keywords})
+  });
+  const data = await r.json();
+  explanations = data.explanations || {};
+}
+
+
+function openViewer(){
+  idx = 0;
+  updateViewer();
+  show($("#viewer"), true);
+}
+
+function renderQuestions(){
+  const box = $("#questions"); box.innerHTML = "";
+  questions.slice(0,5).forEach((q,i)=>{
+    const opts = (q.options||[]).map(o=>
+      `<label><input type="radio" name="q${i}" value="${o}"> ${o}</label><br>`
+    ).join("");
+    box.innerHTML += `<p>${i+1}. ${q.question}</p>${opts}<hr>`;
+  });
+}
+
+$("#prev").onclick = ()=>{ if(idx>0){idx--; updateViewer();}};
+$("#next").onclick = ()=>{ if(idx<order.length-1){idx++; updateViewer();}};
+
+function updateViewer(){
+  const sid = order[idx];
+  $("#slideTitle").textContent = `${sid} (${idx+1}/${order.length})`;
+  $("#slideText").innerHTML = highlight(slides[sid], keywords[sid]||[]);
+  $("#kwList").textContent = (keywords[sid]||[]).join(", ");
+  $("#expText").textContent = explanations[sid]||"(설명 생성 중)";
+}
+
+function escReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function highlight(text, kws){
+  let out = text || "";
+  (kws||[]).forEach(kw=>{
+    try{ out = out.replace(new RegExp(escReg(kw),"gi"), m=>`<span class="kw">${m}</span>`); } catch(e){}
+  });
+  return out;
+}
+
+$("#btnDownload").onclick = async () => {
+  const payload = {subject, level, slides, keywords, explanations};
+  console.log("다운로드 payload:", payload);
+  const r = await fetch("/download", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  });
+  const blob = await r.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "result.zip"; a.click();
+  URL.revokeObjectURL(url);
+  
+
+};
+</script>
+</body>
+</html>

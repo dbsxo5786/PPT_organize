@@ -1,0 +1,144 @@
+/* 파일 업로드 버튼*/
+.upload{
+    background-color: rgb(237, 248, 248);
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+.intro{
+    font-family: 'Nix';
+    text-align: center;
+    font-size: 24px;
+}
+.space-upload{
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+}
+.btn-upload{
+    font-family: 'Nix';
+    font-size: 24px;
+    font-weight: bold;
+    padding: 30px 160px;
+    border : 1px solid rgb(194, 194, 194);
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.btn-submit{
+    display: block;
+    margin: 20px auto;   /* 위아래 여백 20px, 좌우 자동 */
+    font-family: 'Nix';
+    font-size: 20px;
+    padding: 11px 32px;
+    border : 1px solid rgb(194, 194, 194);
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+
+/* 사용자 수준 선택 버튼 */
+.level-select{
+    padding-top: 10px;
+}
+.level-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* 버튼 사이 간격 */
+    margin: 10px 0;
+    justify-content: center;
+    vertical-align: middle;
+    text-align: center;
+    align-items: center;
+}
+.level-btn {
+    font-family: 'Nix';
+    font-size: 20px;
+    display: inline-block;
+    width: 100px;
+    padding-top:10px;
+    padding-bottom: 10px;
+    border: 1px solid rgb(194, 194, 194);
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.level-btn input {
+    display: none; /* 라디오 숨기기 */
+}
+.level-btn.active {
+    background: #a1caf7; /* 선택된 버튼 */
+}
+/* btn-upload와 btn-submit에 hover 효과 추가 */
+.btn-upload:hover, .btn-submit:hover {
+    background-color: #f8f9fa; /* 밝은 회색으로 변경 */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); /* 그림자 강조 */
+}
+/* level-btn에 hover 효과 추가 (선택되지 않은 버튼에만) */
+.level-btn:not(.active):hover {
+    background-color: #f0f0f0;
+}
+
+/* 사용방법 설명 부분*/
+.method {
+    border-top: 1px solid rgb(216, 216, 216);
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    background-color: #f8f8f8; 
+    padding: 40px 20px;
+}
+.method h1 {
+    font-family: 'Nix';
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.method ol {
+    list-style: decimal; 
+    padding-left: 25px;
+    margin: 0;
+    font-family: 'Nix';
+    font-size: 22px;
+    color: #555;
+}
+.method ol li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+.method-content {
+    flex: 1; /* 남은 공간을 모두 차지하도록 설정 */
+    padding-right: 30px; 
+    max-width: 50%;
+    box-sizing: border-box; /* padding을 너비에 포함 */
+}
+.method-image {
+    flex: 1; 
+    background-image: url('../img/main1.jpeg'); 
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    min-height: 300px;
+    border-radius: 8px; 
+    box-shadow: var(--default-shadow); 
+    max-width: 50%;
+}
+@media (max-width: 768px) {
+    .method {
+        flex-direction: column; /* 세로로 쌓이도록 변경 */
+        padding: 20px;
+    }
+    .method-content, .method-image {
+        max-width: 100%; /* 작은 화면에서는 너비 100% */
+        padding-right: 0;
+        margin-bottom: 20px; /* 요소들 사이에 간격 추가 */
+    }
+    .method-image {
+        min-height: 200px; /* 작은 화면에서 높이 조정 */
+    }
+}

@@ -1,0 +1,10 @@
+.footer{
+    font-family: 'Nix';
+    text-align: right;
+    background-color: #f8f8f8;
+    color: rgb(99, 99, 99);
+    margin-top: 0;
+    padding: 10px;
+    border-top: 1px solid rgb(141, 141, 141);
+    font-size: 14px;
+}

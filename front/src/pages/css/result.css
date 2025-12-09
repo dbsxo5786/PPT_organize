@@ -1,0 +1,78 @@
+.result-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Nix', sans-serif;
+    text-align: center;
+}
+
+.preview-box {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 20px;
+    width: 100%;
+    overflow: hidden; /* iframe의 모서리도 둥글게 보이도록 */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.summary-header {
+    padding: 15px 20px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.summary-content {
+    width: 100%;
+    min-height: 300px;
+    padding: 20px;
+    border: none;
+    font-family: 'Nix', sans-serif;
+    font-size: 18px;
+    line-height: 1.7;
+    resize: none; /* 사용자가 크기 조절 못하게 */
+    box-sizing: border-box; /* padding을 너비에 포함 */
+    background-color: #fff;
+    border-radius: 0 0 8px 8px;
+}
+
+.summary-content:focus {
+    outline: none;
+}
+
+.button-group {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-result {
+    font-family: 'Nix';
+    font-size: 18px;
+    padding: 12px 28px;
+    border: 1px solid rgb(194, 194, 194);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-result.download {
+    background-color: #a1caf7;
+    color: white;
+    border-color: #a1caf7;
+}
+
+.btn-result.download:hover {
+    background-color: #89b5e8;
+}
+
+.btn-result.go-home {
+    background-color: #f0f0f0;
+}
+
+.btn-result.go-home:hover {
+    background-color: #e0e0e0;
+}
